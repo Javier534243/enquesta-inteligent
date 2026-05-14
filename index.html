@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistema de Encuestas y Análisis</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <!-- SECCIÓN IZQUIERDA - FORMULARIO -->
+      <div class="left-section">
+        <div class="form-container">
+          <h1 class="form-title">Encuesta</h1>
+          <form id="surveyForm">
+            <div class="form-group">
+              <label for="groupSelect">Grupo</label>
+              <select id="groupSelect" required>
+                <option value="">Selecciona un grupo</option>
+                <option value="Grupo A">Grupo A</option>
+                <option value="Grupo B">Grupo B</option>
+                <option value="Grupo C">Grupo C</option>
+                <option value="Grupo D">Grupo D</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="satisfactionInput">Satisfacción Global (1-5)</label>
+              <div class="rating-input">
+                <input
+                  type="number"
+                  id="satisfactionInput"
+                  min="1"
+                  max="5"
+                  required
+                  placeholder="Ingresa puntuación"
+                />
+                <div class="stars-display">
+                  <span id="starsDisplay">☆☆☆☆☆</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="commentArea">Comentario</label>
+              <textarea
+                id="commentArea"
+                rows="6"
+                placeholder="Escribe tu comentario aquí..."
+              ></textarea>
+            </div>
+
+            <button type="submit" class="btn-save">Guardar Respuesta</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- SECCIÓN DERECHA - PANEL ANALÍTICO -->
+      <div class="right-section">
+        <!-- ENCABEZADO DEL PANEL -->
+        <div class="panel-header">
+          <h1 class="panel-title">Panel Analítico</h1>
+          <div class="filter-group">
+            <label for="filterSelect">Filtro de Grupo</label>
+            <select id="filterSelect">
+              <option value="Todos">Todos los grupos</option>
+              <option value="Grupo A">Grupo A</option>
+              <option value="Grupo B">Grupo B</option>
+              <option value="Grupo C">Grupo C</option>
+              <option value="Grupo D">Grupo D</option>
+            </select>
+          </div>
+          <p class="panel-description" id="panelDescription">
+            Los datos que se muestran corresponden a todas las respuestas
+            recopiladas de todos los grupos.
+          </p>
+        </div>
+
+        <!-- MÉTRICAS PRINCIPALES -->
+        <div class="metrics-container">
+          <div class="metric-card">
+            <div class="metric-label">Respuestas Totales</div>
+            <div class="metric-value" id="totalResponses">0</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Mediana</div>
+            <div class="metric-value" id="medianValue">0</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">% Positivas (4-5)</div>
+            <div class="metric-value" id="positivePercentage">0%</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Grupo Analizado</div>
+            <div class="metric-value" id="analyzedGroup">Todos</div>
+          </div>
+        </div>
+
+        <!-- DISTRIBUCIÓN DE VALORACIONES -->
+        <div class="chart-section">
+          <h2 class="section-subtitle">Distribución de Valoraciones</h2>
+          <div class="distribution-bars">
+            <div class="bar-item">
+              <div class="bar-label">1 ⭐</div>
+              <div class="bar-container">
+                <div class="bar-fill" id="bar1" style="width: 0%"></div>
+              </div>
+              <div class="bar-count" id="count1">0</div>
+            </div>
+            <div class="bar-item">
+              <div class="bar-label">2 ⭐</div>
+              <div class="bar-container">
+                <div class="bar-fill" id="bar2" style="width: 0%"></div>
+              </div>
+              <div class="bar-count" id="count2">0</div>
+            </div>
+            <div class="bar-item">
+              <div class="bar-label">3 ⭐</div>
+              <div class="bar-container">
+                <div class="bar-fill" id="bar3" style="width: 0%"></div>
+              </div>
+              <div class="bar-count" id="count3">0</div>
+            </div>
+            <div class="bar-item">
+              <div class="bar-label">4 ⭐</div>
+              <div class="bar-container">
+                <div class="bar-fill" id="bar4" style="width: 0%"></div>
+              </div>
+              <div class="bar-count" id="count4">0</div>
+            </div>
+            <div class="bar-item">
+              <div class="bar-label">5 ⭐</div>
+              <div class="bar-container">
+                <div class="bar-fill" id="bar5" style="width: 0%"></div>
+              </div>
+              <div class="bar-count" id="count5">0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- GRÁFICO DE QUESITO -->
+        <div class="chart-section">
+          <h2 class="section-subtitle">Gráfico de Puntuaciones</h2>
+          <div class="pie-charts-container">
+            <div class="pie-chart-wrapper">
+              <h3>Distribución Total</h3>
+              <canvas id="pieChart"></canvas>
+            </div>
+            <div class="pie-chart-wrapper">
+              <h3>Positivas vs No Positivas</h3>
+              <canvas id="sentimentChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMPARATIVA DE MEDIANA POR GRUPO -->
+        <div class="chart-section">
+          <h2 class="section-subtitle">Comparativa de Mediana por Grupo</h2>
+          <div class="median-comparison">
+            <div class="median-bar">
+              <div class="median-label">Grupo A</div>
+              <div class="comparison-bar-container">
+                <div
+                  class="comparison-bar-fill"
+                  id="medianBarA"
+                  style="width: 0%"
+                ></div>
+              </div>
+              <div class="median-value" id="medianA">-</div>
+            </div>
+            <div class="median-bar">
+              <div class="median-label">Grupo B</div>
+              <div class="comparison-bar-container">
+                <div
+                  class="comparison-bar-fill"
+                  id="medianBarB"
+                  style="width: 0%"
+                ></div>
+              </div>
+              <div class="median-value" id="medianB">-</div>
+            </div>
+            <div class="median-bar">
+              <div class="median-label">Grupo C</div>
+              <div class="comparison-bar-container">
+                <div
+                  class="comparison-bar-fill"
+                  id="medianBarC"
+                  style="width: 0%"
+                ></div>
+              </div>
+              <div class="median-value" id="medianC">-</div>
+            </div>
+            <div class="median-bar">
+              <div class="median-label">Grupo D</div>
+              <div class="comparison-bar-container">
+                <div
+                  class="comparison-bar-fill"
+                  id="medianBarD"
+                  style="width: 0%"
+                ></div>
+              </div>
+              <div class="median-value" id="medianD">-</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ÚLTIMAS RESPUESTAS -->
+        <div class="responses-section">
+          <h2 class="section-subtitle">Últimas Respuestas</h2>
+          <div id="responsesList" class="responses-list">
+            <!-- Las respuestas se añadirán dinámicamente -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
