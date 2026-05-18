@@ -1,7 +1,7 @@
 // Configuración de Supabase
 const SUPABASE_URL = "https://hassxrmxjvrktqmmyvcv.supabase.co";
 const SUPABASE_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhhc3N4cm14anZya3JxbW15dmN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMTc4MzgsImV4cCI6MjA5NDY5MzgzOH0.UaxlYNomjhsbv3cMa8Hn9hVwhylFLqSP9O_iwUYqOK8";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhhc3N4cm14anZya3RxbW15dmN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMTc4MzgsImV4cCI6MjA5NDY5MzgzOH0.UaxlYNomjhsbv3cMa8Hn9hVwhylFLqSP9O_iwUYqOK8";
 const SUPABASE_TABLE = "responses"; // Ajusta el nombre de la tabla si es necesario
 
 let responses = [];
@@ -85,9 +85,7 @@ function getFilteredResponses() {
 function getSupabaseHeaders() {
   return {
     apikey: SUPABASE_KEY,
-    Authorization: `Bearer ${SUPABASE_KEY}`,
     "Content-Type": "application/json",
-    Accept: "application/json",
   };
 }
 
