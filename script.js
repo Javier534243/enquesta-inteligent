@@ -124,7 +124,8 @@ async function insertResponse(payload) {
     throw new Error(`Supabase insert error: ${response.status} ${errorText}`);
   }
 
-  return response.json();
+  const text = await response.text();
+  return text ? JSON.parse(text) : null;
 }
 
 // Calcular estadísticas

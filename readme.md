@@ -13,3 +13,10 @@ group (text)
 rating (integer, con validación 1 a 5)
 comment (text)
 created_at (timestamptz, default now())
+
+—------------------------------------------------------------
+
+ahora me ha salido este error:
+script.js:63 Error guardando la respuesta: SyntaxError: Failed to execute 'json' on 'Response': Unexpected end of JSON input
+    at insertResponse (script.js:127:19)
+    at async HTMLFormElement.handleFormSubmit (script.js:53:5)
