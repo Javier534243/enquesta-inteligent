@@ -1,28 +1,10 @@
-// Datos almacenados
-let responses = [
-  {
-    group: "Grupo A",
-    rating: 5,
-    comment: "Excelente servicio, muy satisfecho con la atención.",
-  },
-  {
-    group: "Grupo B",
-    rating: 4,
-    comment: "Muy bueno, podría mejorar un poco.",
-  },
-  { group: "Grupo C", rating: 3, comment: "Está bien, pero esperaba más." },
-  {
-    group: "Grupo A",
-    rating: 5,
-    comment: "Extraordinario, volvería a contratar.",
-  },
-  {
-    group: "Grupo D",
-    rating: 2,
-    comment: "Necesita mejorar en varios aspectos.",
-  },
-];
+// Configuración de Supabase
+const SUPABASE_URL = "https://hassxrmxjvrktqmmyvcv.supabase.co";
+const SUPABASE_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhhc3N4cm14anZya3RxbW15dmN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMTc4MzgsImV4cCI6MjA5NDY5MzgzOH0.UaxlYNomjhsbv3cMa8Hn9hVwhylFLqSP9O_iwUYqOK8";
+const SUPABASE_TABLE = "responses"; // Ajusta el nombre de la tabla si es necesario
 
+let responses = [];
 let pieChart = null;
 let sentimentChart = null;
 let currentFilter = "Todos";
@@ -50,31 +32,39 @@ function updateStarsDisplay() {
 }
 
 // Manejar envío del formulario
-function handleFormSubmit(e) {
+async function handleFormSubmit(e) {
   e.preventDefault();
 
   const group = groupSelect.value;
-  const rating = parseInt(satisfactionInput.value);
-  const comment = commentArea.value;
+  const rating = parseInt(satisfactionInput.value, 10);
+  const comment = commentArea.value || "";
 
-  if (!group || !rating) {
+  if (!group || Number.isNaN(rating)) {
     alert("Por favor completa el formulario");
     return;
   }
 
-  // Agregar respuesta
-  responses.push({
-    group: group,
-    rating: rating,
-    comment: comment,
-  });
+  if (rating < 1 || rating > 5) {
+    alert("La puntuación debe ser un número entre 1 y 5.");
+    return;
+  }
 
-  // Limpiar formulario
-  surveyForm.reset();
-  starsDisplay.textContent = "☆☆☆☆☆";
+  try {
+    await insertResponse({ group, rating, comment });
+    await loadResponses();
 
-  // Actualizar panel
-  updatePanel();
+    // Limpiar formulario
+    surveyForm.reset();
+    starsDisplay.textContent = "☆☆☆☆☆";
+
+    // Actualizar panel
+    updatePanel();
+  } catch (error) {
+    console.error("Error guardando la respuesta:", error);
+    alert(
+      "No se pudo guardar la respuesta en la base de datos. Revisa la consola.",
+    );
+  }
 }
 
 // Manejar cambio de filtro
@@ -89,6 +79,52 @@ function getFilteredResponses() {
     return responses;
   }
   return responses.filter((r) => r.group === currentFilter);
+}
+
+// Encabezados comunes para Supabase
+function getSupabaseHeaders() {
+  return {
+    apikey: SUPABASE_KEY,
+    "Content-Type": "application/json",
+  };
+}
+
+// Cargar respuestas desde Supabase
+async function loadResponses() {
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?select=*&order=created_at.desc`,
+      {
+        headers: getSupabaseHeaders(),
+      },
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Supabase load error: ${response.status} ${errorText}`);
+    }
+
+    responses = await response.json();
+  } catch (error) {
+    console.error("Error cargando respuestas:", error);
+    responses = [];
+  }
+}
+
+// Insertar una nueva respuesta en Supabase
+async function insertResponse(payload) {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}`, {
+    method: "POST",
+    headers: getSupabaseHeaders(),
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Supabase insert error: ${response.status} ${errorText}`);
+  }
+
+  return response.json();
 }
 
 // Calcular estadísticas
@@ -401,4 +437,9 @@ function escapeHtml(text) {
 }
 
 // Inicializar la página
-updatePanel();
+async function init() {
+  await loadResponses();
+  updatePanel();
+}
+
+init();
