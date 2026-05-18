@@ -36,11 +36,16 @@ async function handleFormSubmit(e) {
   e.preventDefault();
 
   const group = groupSelect.value;
-  const rating = parseInt(satisfactionInput.value);
+  const rating = parseInt(satisfactionInput.value, 10);
   const comment = commentArea.value || "";
 
-  if (!group || !rating) {
+  if (!group || Number.isNaN(rating)) {
     alert("Por favor completa el formulario");
+    return;
+  }
+
+  if (rating < 1 || rating > 5) {
+    alert("La puntuación debe ser un número entre 1 y 5.");
     return;
   }
 
@@ -90,7 +95,7 @@ function getSupabaseHeaders() {
 async function loadResponses() {
   try {
     const response = await fetch(
-      `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?select=*`,
+      `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?select=*&order=created_at.desc`,
       {
         headers: getSupabaseHeaders(),
       },
